@@ -1,7 +1,9 @@
-streamlit
+streamlit>=1.26
+pillow
+numpy
 pandas
 scikit-learn
 joblib
-numpy
-pdpipe
-requests
+easyocr
+torch>=2.0.0; platform_system!="Windows" or platform_machine!="x86_64"
+torch==2.2.2+cpu; platform_system=="Windows" and platform_machine=="x86_64" and python_version>="3.10" ; extra=="cpu"
