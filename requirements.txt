@@ -1,9 +1,5 @@
 streamlit==1.36.0
 pandas==2.2.2
 numpy==1.26.4
-opencv-python-headless==4.10.0.84
-Pillow==10.3.0
-tensorflow==2.17.0
-keras==3.3.3
 scikit-learn==1.5.1
-matplotlib==3.9.0
+joblib==1.4.2
