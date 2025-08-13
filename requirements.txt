@@ -7,6 +7,14 @@ joblib==1.4.2
 python-bidi==0.4.2
 scipy==1.13.1
 opencv-python-headless==4.9.0.80
+
+# Torch CPU wheels (precompiled — no building from source)
 --extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.2.2+cpu
+torch==2.2.0+cpu
+torchvision==0.17.0+cpu
+torchaudio==2.2.0+cpu
+
+# EasyOCR (precompiled dependencies)
+shapely==2.0.3
+pyclipper==1.3.0.post5
 easyocr==1.7.1
