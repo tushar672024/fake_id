@@ -1,21 +1,37 @@
 import pandas as pd
 import streamlit as st
 import joblib
-from label_encoder import label_encoding
+from label_encoder import label_encoding  # Make sure this file is present
 
-st.set_page_config(page_title="Instagram Fake Account Detector — Manual Input", page_icon="📝", layout="centered")
+# ------------------------
+# Streamlit page config
+# ------------------------
+st.set_page_config(
+    page_title="Instagram Fake Account Detector — Manual Input",
+    page_icon="📝",
+    layout="centered"
+)
 st.title("📝 Instagram Fake Account Detector — Manual Input")
 st.caption("Fill in the profile details, and we'll predict Fake/Real.")
 
+# ------------------------
+# Load artifacts (model + scaler)
+# ------------------------
 @st.cache_resource
 def load_artifacts():
     model = joblib.load("model.pkl")
     scaler = joblib.load("scaler.pkl")
     return model, scaler
 
-model, scaler = load_artifacts()
+try:
+    model, scaler = load_artifacts()
+except FileNotFoundError as e:
+    st.error("❌ Model or scaler file not found. Please upload model.pkl and scaler.pkl.")
+    st.stop()
 
-# User input fields
+# ------------------------
+# User Inputs
+# ------------------------
 username = st.text_input("Username")
 fullname = st.text_input("Full Name")
 num_posts = st.number_input("Number of Posts", min_value=0, step=1)
@@ -25,11 +41,17 @@ profile_pic = st.selectbox("Profile Picture Present?", ["Yes", "No"])
 private = st.selectbox("Is Private Account?", ["Yes", "No"])
 extern_url = st.selectbox("Has External URL?", ["Yes", "No"])
 len_desc = st.number_input("Bio Length (characters)", min_value=0, step=1)
+
+# Ratios & Derived Features
 ratio_numlen_username = sum(c.isdigit() for c in username) / max(len(username), 1)
 ratio_numlen_fullname = sum(c.isdigit() for c in fullname) / max(len(fullname), 1)
 sim_name_username = "Yes" if username and fullname and username.lower() in fullname.lower() else "No"
 
+# ------------------------
+# Predict Button
+# ------------------------
 if st.button("Predict"):
+    # Step 1: Build feature row
     feat_row = {
         "profile_pic": profile_pic,
         "extern_url": extern_url,
@@ -43,18 +65,29 @@ if st.button("Predict"):
         "num_following": int(num_following),
         "sim_name_username": sim_name_username
     }
-    
+
+    # Step 2: Create DataFrame
     features_df = pd.DataFrame([feat_row])
+
     try:
+        # Step 3: Encode categorical variables (match training pipeline)
         df_encoded = label_encoding(features_df)
+
+        # Step 4: Ensure column order matches training
+        train_columns = scaler.feature_names_in_
+        df_encoded = df_encoded[train_columns]
+
+        # Step 5: Scale and Predict
         X = scaler.transform(df_encoded)
         pred = model.predict(X)[0]
         proba = float(model.predict_proba(X)[0, 1])
-        
+
+        # Step 6: Display results
         if pred == 1:
             st.error(f"🚨 FAKE Account Detected — probability {proba:.2f}")
         else:
             st.success(f"✅ Real Account Detected — probability {proba:.2f}")
+
     except Exception as e:
-        st.error("Model/encoding error — check that your artifacts match the training pipeline.")
+        st.error("❌ Model/encoding error — check that your artifacts match the training pipeline.")
         st.exception(e)
