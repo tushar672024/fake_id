@@ -25,7 +25,7 @@ def load_artifacts():
 
 try:
     model, scaler = load_artifacts()
-except FileNotFoundError as e:
+except FileNotFoundError:
     st.error("❌ Model or scaler file not found. Please upload model.pkl and scaler.pkl.")
     st.stop()
 
@@ -40,7 +40,10 @@ num_following = st.number_input("Number of Following", min_value=0, step=1)
 profile_pic = st.selectbox("Profile Picture Present?", ["Yes", "No"])
 private = st.selectbox("Is Private Account?", ["Yes", "No"])
 extern_url = st.selectbox("Has External URL?", ["Yes", "No"])
-len_desc = st.number_input("Bio Length (characters)", min_value=0, step=1)
+
+# Bio input
+bio = st.text_area("Paste Bio Here")
+len_desc = len(bio)  # Auto-compute bio length
 
 # Ratios & Derived Features
 ratio_numlen_username = sum(c.isdigit() for c in username) / max(len(username), 1)
