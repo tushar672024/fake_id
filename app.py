@@ -1,9 +1,20 @@
 import pandas as pd
 import streamlit as st
 import joblib
-from label_encoder import label_encoding  # Make sure this file is present
 
 # ------------------------
+# Label Encoding Function
+# ------------------------
+def label_encoding(df):
+    """
+    Encode categorical features using one-hot encoding.
+    Columns: 'profile_pic', 'extern_url', 'private', 'sim_name_username'
+    """
+    categorical_cols = ["profile_pic", "extern_url", "private", "sim_name_username"]
+    df_encoded = pd.get_dummies(df, columns=categorical_cols, drop_first=False)
+    return df_encoded
+
+# -----------------------
 # Streamlit page config
 # ------------------------
 st.set_page_config(
@@ -73,11 +84,15 @@ if st.button("Predict"):
     features_df = pd.DataFrame([feat_row])
 
     try:
-        # Step 3: Encode categorical variables (match training pipeline)
+        # Step 3: Encode categorical variables
         df_encoded = label_encoding(features_df)
 
         # Step 4: Ensure column order matches training
         train_columns = scaler.feature_names_in_
+        for col in train_columns:
+            if col not in df_encoded.columns:
+                # Add missing columns with 0
+                df_encoded[col] = 0
         df_encoded = df_encoded[train_columns]
 
         # Step 5: Scale and Predict
