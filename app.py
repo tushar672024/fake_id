@@ -30,8 +30,8 @@ st.caption("Fill in the profile details, and we'll predict Fake/Real.")
 # ------------------------
 @st.cache_resource
 def load_artifacts():
-    model = joblib.load("model.pkl")
-    scaler = joblib.load("scaler.pkl")
+    model = joblib.load("model1.pkl")
+    scaler = joblib.load("scaler1.pkl")
     return model, scaler
 
 try:
